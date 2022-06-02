@@ -1,7 +1,7 @@
 
 # GTerm 
 <p align="center">
-  <img src="/figures/bio_logo.jpeg" alt="Bio logo"/>
+  <img src="/figures/bio_logo.png" alt="Bio logo"/>
 </p>
 
 Displays video or images in terminal. 
