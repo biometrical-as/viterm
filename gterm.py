@@ -86,32 +86,40 @@ class Display:
         sec_pr_frame = 1 / 30
         first_frame = True
 
-        t = time()
-        success, frame = cap.read()
-        while success:
-
-            frame = self.preprocess_image(frame)
-
-            if not first_frame:
-                sys.stdout.write(Display.ANSI_CURSOR_UP * txt_length)
-            else:
-                first_frame = False
-
-            txt_length = self.display_image(frame)
-
-            sleep_time = sec_pr_frame - (time() - t)
-            if 0 <= sleep_time:
-                sleep(sleep_time)
-
+        try:
+            t = time()
             success, frame = cap.read()
+            while success:
 
+                frame = self.preprocess_image(frame)
+
+                if not first_frame:
+                    sys.stdout.write(Display.ANSI_CURSOR_UP * txt_length)
+                else:
+                    first_frame = False
+
+                txt_length = self.display_image(frame)
+
+                sleep_time = sec_pr_frame - (time() - t)
+                if 0 <= sleep_time:
+                    sleep(sleep_time)
+
+                success, frame = cap.read()
+        except KeyboardInterrupt:
+            sys.stdout.write(Display.ANSI_CURSOR_UP * txt_length)
+            sys.stdout.write(txt_length*' ')
+            sys.stdout.write(Display.ANSI_CURSOR_UP * txt_length)
 
 
 def parse_args():
     parser = ArgumentParser(
         "GTerm: displays low-color-representation of image or video in terminal"
     )
-    parser.add_argument("media", type=str, help="Media file to display. Image or video")
+    parser.add_argument(
+        "media",
+        type=str,
+        help="Media file to display. Image or video. Index for usb camera",
+    )
     parser.add_argument(
         "--character",
         "-c",
@@ -130,9 +138,17 @@ def parse_args():
 
 if __name__ == "__main__":
     args = parse_args()
+    resolution = args.resolution
+    character = args.character
+    media = args.media
+    try:
+        media = int(media)
+    except Exception:
+        pass
 
-    display = Display(args.resolution, args.character)
-    display.show_media(args.media)
+    display = Display(resolution, character)
+
+    display.show_media(media)
 
     # display.show_video("/home/martin/Downloads/bh_slice.mp4")
 
