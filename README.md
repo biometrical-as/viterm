@@ -30,11 +30,11 @@ Run ```source ~/.bashrc``` (linux) or ```source ~/.zshrc``` (mac). You can now c
 
 ## Use
 Without alias:
-```
+```bash
 python viterm.py <media> -r <Height Width> -c <display character> 
 ```
 With alias:
-```
+```bash
 viterm <media> -r <Height Width> -c <display character> 
 ```
 * media: Accepts video, images, webcam-index, rtsp-streams and anything else which is supported by cv2.VideoCapture
