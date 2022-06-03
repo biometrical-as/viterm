@@ -14,6 +14,7 @@ viterm is developed for python >=3.8.
 pip install -r requirements.txt
 ```
 
+### Optional
 To make an alias, append the following line to your .bashrc (linux) or .zshrc (mac):
 
 ```bash
