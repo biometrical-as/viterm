@@ -10,7 +10,7 @@ import numpy as np
 class Display:
     COLORS_STEPS = np.array([0, 95, 135, 175, 215, 255])
     INDICIES = np.arange(len(COLORS_STEPS))
-    STORED_CELL_CHAR = "█"
+    STORED_CELL_CHAR = "██"
     ANSI_RESET = "\u001b[0m"
     ANSI_CURSOR_UP = "\u001b[A"
 
@@ -20,6 +20,8 @@ class Display:
         display_char: str = None,
     ):
         self._shape = output_shape
+        if display_char is not None and len(display_char) == 1: 
+            display_char *= 2 
         self._display_char = display_char
 
     @staticmethod
@@ -56,7 +58,7 @@ class Display:
         for i in range(image.shape[0]):
             row = ""
             for j in range(image.shape[1]):
-                row += self.color_to_xterm_code(xterm_col[i, j]) * 2
+                row += self.color_to_xterm_code(xterm_col[i, j])
             txt += row + "\n"
 
         sys.stdout.write(txt)
@@ -65,7 +67,6 @@ class Display:
         return len(txt)
 
     def preprocess_image(self, image: np.ndarray) -> np.ndarray:
-        shape = (100, 100)
         if self._shape is not None:
             try:
                 shape = (int(self._shape[1]), int(self._shape[0]))
@@ -75,7 +76,8 @@ class Display:
                     image, None, fx=float(self._shape[0]), fy=float(self._shape[0])
                 )
         else:
-            image = cv2.resize(image, shape)
+            s = 40 / image.shape[1]
+            image = cv2.resize(image, None, fx=s, fy=s)
 
         image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
         return image
@@ -107,7 +109,7 @@ class Display:
                 success, frame = cap.read()
         except KeyboardInterrupt:
             sys.stdout.write(Display.ANSI_CURSOR_UP * txt_length)
-            sys.stdout.write(txt_length*' ')
+            sys.stdout.write(txt_length * " ")
             sys.stdout.write(Display.ANSI_CURSOR_UP * txt_length)
 
 
@@ -130,7 +132,7 @@ def parse_args():
         "--resolution",
         "-r",
         nargs=2,
-        default=(100, 100),
+        default=None,
         help="Outputresolution",
     )
     return parser.parse_args()
