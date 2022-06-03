@@ -6,6 +6,9 @@
 
 Displays video, images, webcam or rtsp stream in terminal. 
 
+## Requirements
+viterm is developed for python >=3.8.
+
 ## Setup
 ```
 pip install -r requirements.txt
