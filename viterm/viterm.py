@@ -1,8 +1,6 @@
-#!/usr/bin/env python3
 import sys
 from typing import Tuple
 from time import time, sleep
-from argparse import ArgumentParser
 
 import cv2
 import numpy as np
@@ -114,51 +112,3 @@ class Display:
             sys.stdout.write(Display.ANSI_CURSOR_UP * txt_length)
 
 
-def parse_args():
-    parser = ArgumentParser(
-        "GTerm: displays low-color-representation of image or video in terminal"
-    )
-    parser.add_argument(
-        "media",
-        type=str,
-        help="Media file to display. Image or video. Index for usb camera",
-    )
-    parser.add_argument(
-        "--character",
-        "-c",
-        default=Display.STORED_CELL_CHAR,
-        help="Ascii character used",
-    )
-    parser.add_argument(
-        "--resolution",
-        "-r",
-        nargs=2,
-        default=None,
-        help="Outputresolution",
-    )
-    return parser.parse_args()
-
-
-if __name__ == "__main__":
-    args = parse_args()
-    resolution = args.resolution
-    character = args.character
-    media = args.media
-    try:
-        media = int(media)
-    except Exception:
-        pass
-
-    display = Display(resolution, character)
-
-    display.show_media(media)
-
-    # display.show_video("/home/martin/Downloads/bh_slice.mp4")
-
-    # image = cv2.imread("/home/martin/Downloads/lk.jpeg")
-    # image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
-    # image = cv2.resize(image, (100, 100))
-
-    # t = time()
-    # display.display_image(image)
-    # print(time() - t)
