@@ -1,6 +1,6 @@
 import sys
-from typing import Tuple
 from time import time, sleep
+from typing import Tuple, Callable
 
 import cv2
 import numpy as np
@@ -17,11 +17,16 @@ class Display:
         self,
         output_shape: Tuple[int, int] = None,
         display_char: str = None,
+        preprocess_func: Callable = None 
     ):
         self._shape = output_shape
         if display_char is not None and len(display_char) == 1: 
             display_char *= 2 
         self._display_char = display_char
+        self._ext_preprocess_func = lambda x: x 
+
+        if preprocess_func is not None: 
+            self._ext_preprocess_func = preprocess_func
 
     @staticmethod
     def image_to_xterm(image):
@@ -79,6 +84,7 @@ class Display:
             image = cv2.resize(image, None, fx=s, fy=s)
 
         image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+        image = self._ext_preprocess_func(image)
         return image
 
     def show_media(self, video):

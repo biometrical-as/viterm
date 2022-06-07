@@ -1,6 +1,9 @@
 from argparse import ArgumentParser
 
-from viterm.viterm import Display
+import cv2
+import numpy as np
+
+from viterm import Display
 
 
 def parse_args():
@@ -25,7 +28,19 @@ def parse_args():
         default=None,
         help="Outputresolution",
     )
+    parser.add_argument(
+        "--preprocess",
+        "-p",
+        type=str,
+        help="Preprocess function. Only canny edgedetection supported atm",
+    )
     return parser.parse_args()
+
+
+def canny(image: np.ndarray):
+    image = cv2.Canny(image, 100, 200)
+    image = cv2.cvtColor(image, cv2.COLOR_GRAY2RGB)
+    return image
 
 
 if __name__ == "__main__":
@@ -38,6 +53,12 @@ if __name__ == "__main__":
     except Exception:
         pass
 
-    display = Display(resolution, character)
+    preprocess = None
+    if args.preprocess == "canny":
+        preprocess = canny
+    else:
+        raise NotImplementedError("Only Canny edge detection supported ATM")
+
+    display = Display(resolution, character, preprocess_func=preprocess)
 
     display.show_media(media)

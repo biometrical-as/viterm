@@ -1,1 +1,1 @@
-from viterm.viterm import Display
+from viterm.display import Display
