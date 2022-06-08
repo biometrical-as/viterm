@@ -53,9 +53,10 @@ if __name__ == "__main__":
     except Exception:
         pass
 
-    preprocess = None
     if args.preprocess == "canny":
         preprocess = canny
+    elif args.preprocess is None:
+        preprocess = None
     else:
         raise NotImplementedError("Only Canny edge detection supported ATM")
 
