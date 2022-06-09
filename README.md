@@ -43,7 +43,10 @@ viterm <media> -r <Height Width> -c <display character>
 * media: Accepts video, images, webcam-index, rtsp-streams and anything else which is supported by cv2.VideoCapture
 * --resolution: Two values. Int to set pixel width/height, float to scale image dimension. The image is scaled down to a width of 40 by default (keeping aspect ratio)
 * --character: String of what character to use as a display-pixel. Default is ██. 
-
+* --fps: Set fps of video 
+* --fit_to_terminal: Resize image/video to fit terminal size
+* --loop: loops media
+* --preprocess: Runs a aditional preprocessor on media. Only Canny edge detections is supported ATM
 
 ## Optional
 To make an alias, append the following line to your .bashrc (linux) or .zshrc (mac):
