@@ -1,4 +1,3 @@
-from asyncore import loop
 import sys
 import shutil
 from time import time, sleep
@@ -19,18 +18,18 @@ class Display:
         self,
         output_shape: Tuple[int, int] = None,
         display_char: str = None,
-        preprocess_func: Callable = None, 
-        fit_to_terminal: bool = False
+        preprocess_func: Callable = None,
+        fit_to_terminal: bool = False,
     ):
         self._shape = output_shape
         self._fit_to_terminal = fit_to_terminal
 
-        if display_char is not None and len(display_char) == 1: 
-            display_char *= 2 
+        if display_char is not None and len(display_char) == 1:
+            display_char *= 2
         self._display_char = display_char
-        self._ext_preprocess_func = lambda x: x 
+        self._ext_preprocess_func = lambda x: x
 
-        if preprocess_func is not None: 
+        if preprocess_func is not None:
             self._ext_preprocess_func = preprocess_func
 
     @staticmethod
@@ -48,6 +47,7 @@ class Display:
 
         idx = np.argmin(np.abs(at - bt), axis=0)
         xterm_img = Display.INDICIES[idx]
+
         return 16 + xterm_img[..., 0] * 36 + xterm_img[..., 1] * 6 + xterm_img[..., 2]
 
     def color_to_xterm_code(self, col, character: str = None):
@@ -62,7 +62,6 @@ class Display:
 
     def display_image(self, image: np.ndarray):
         xterm_col = Display.image_to_xterm(image)
-
         txt = ""
         for i in range(image.shape[0]):
             row = ""
@@ -77,8 +76,8 @@ class Display:
 
     def preprocess_image(self, image: np.ndarray) -> np.ndarray:
         if self._fit_to_terminal:
-            h, w = self.get_terminal_size() 
-            scale = min(h/image.shape[0], w/image.shape[1])
+            h, w = self.get_terminal_size()
+            scale = min(h / image.shape[0], w / image.shape[1])
             image = cv2.resize(image, None, fx=scale, fy=scale)
         elif self._shape is not None:
             try:
@@ -96,13 +95,16 @@ class Display:
         image = self._ext_preprocess_func(image)
         return image
 
-    def get_terminal_size(self):         
-        size = shutil.get_terminal_size() 
-        return size.lines, size.columns//len(self._display_char) 
+    def get_terminal_size(self):
+        size = shutil.get_terminal_size()
+        return size.lines, size.columns // len(self._display_char)
 
-    def show_media(self, media: str, fps: Union[int, float] = 30, loop: bool = False):
-        
-
+    def show_media(
+        self,
+        media: str,
+        fps: Union[int, float] = 30,
+        loop: bool = False,
+    ):
         first_frame = True
         sec_pr_frame = 1 / fps
         try:
@@ -126,12 +128,11 @@ class Display:
                         sleep(sleep_time)
                     t = time()
                     success, frame = cap.read()
-                
-                if not loop: 
-                    break 
+
+                if not loop:
+                    break
         except KeyboardInterrupt:
             sys.stdout.write(Display.ANSI_CURSOR_UP * txt_length)
             sys.stdout.write(txt_length * " ")
             sys.stdout.write(Display.ANSI_CURSOR_UP * txt_length)
             raise KeyboardInterrupt()
-
