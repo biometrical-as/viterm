@@ -1,6 +1,8 @@
+from asyncore import loop
 import sys
+import shutil
 from time import time, sleep
-from typing import Tuple, Callable
+from typing import Tuple, Callable, Union
 
 import cv2
 import numpy as np
@@ -17,9 +19,12 @@ class Display:
         self,
         output_shape: Tuple[int, int] = None,
         display_char: str = None,
-        preprocess_func: Callable = None 
+        preprocess_func: Callable = None, 
+        fit_to_terminal: bool = False
     ):
         self._shape = output_shape
+        self._fit_to_terminal = fit_to_terminal
+
         if display_char is not None and len(display_char) == 1: 
             display_char *= 2 
         self._display_char = display_char
@@ -71,7 +76,11 @@ class Display:
         return len(txt)
 
     def preprocess_image(self, image: np.ndarray) -> np.ndarray:
-        if self._shape is not None:
+        if self._fit_to_terminal:
+            h, w = self.get_terminal_size() 
+            scale = min(h/image.shape[0], w/image.shape[1])
+            image = cv2.resize(image, None, fx=scale, fy=scale)
+        elif self._shape is not None:
             try:
                 shape = (int(self._shape[1]), int(self._shape[0]))
                 image = cv2.resize(image, shape)
@@ -87,34 +96,42 @@ class Display:
         image = self._ext_preprocess_func(image)
         return image
 
-    def show_media(self, video):
-        cap = cv2.VideoCapture(video)
+    def get_terminal_size(self):         
+        size = shutil.get_terminal_size() 
+        return size.lines, size.columns//len(self._display_char) 
 
-        sec_pr_frame = 1 / 30
+    def show_media(self, media: str, fps: Union[int, float] = 30, loop: bool = False):
+        
+
         first_frame = True
-
+        sec_pr_frame = 1 / fps
         try:
-            t = time()
-            success, frame = cap.read()
-            while success:
-
-                frame = self.preprocess_image(frame)
-
-                if not first_frame:
-                    sys.stdout.write(Display.ANSI_CURSOR_UP * txt_length)
-                else:
-                    first_frame = False
-
-                txt_length = self.display_image(frame)
-
-                sleep_time = sec_pr_frame - (time() - t)
-                if 0 <= sleep_time:
-                    sleep(sleep_time)
-
+            while True:
+                cap = cv2.VideoCapture(media)
+                t = time()
                 success, frame = cap.read()
+                while success:
+
+                    frame = self.preprocess_image(frame)
+
+                    if not first_frame:
+                        sys.stdout.write(Display.ANSI_CURSOR_UP * txt_length)
+                    else:
+                        first_frame = False
+
+                    txt_length = self.display_image(frame)
+
+                    sleep_time = sec_pr_frame - (time() - t)
+                    if 0 <= sleep_time:
+                        sleep(sleep_time)
+                    t = time()
+                    success, frame = cap.read()
+                
+                if not loop: 
+                    break 
         except KeyboardInterrupt:
             sys.stdout.write(Display.ANSI_CURSOR_UP * txt_length)
             sys.stdout.write(txt_length * " ")
             sys.stdout.write(Display.ANSI_CURSOR_UP * txt_length)
-
+            raise KeyboardInterrupt()
 

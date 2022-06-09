@@ -8,7 +8,7 @@ from viterm import Display
 
 def parse_args():
     parser = ArgumentParser(
-        "GTerm: displays low-color-representation of image or video in terminal"
+        "ViTerm: displays low-color-representation of image or video in terminal"
     )
     parser.add_argument(
         "media",
@@ -22,11 +22,29 @@ def parse_args():
         help="Ascii character used",
     )
     parser.add_argument(
+        '--fit_to_terminal', 
+        '-f', 
+        action='store_true', 
+        help='Fit image to terminal size, keeping aspect ratio'
+    )
+    parser.add_argument(
         "--resolution",
         "-r",
         nargs=2,
         default=None,
-        help="Outputresolution",
+        help="Output resolution",
+    )
+    parser.add_argument(
+        '--loop', 
+        '-l', 
+        action='store_true', 
+        help='Loop media',
+    )
+    parser.add_argument(
+        '--fps', 
+        default=30, 
+        type=int, 
+        help='Set FPS of video'
     )
     parser.add_argument(
         "--preprocess",
@@ -60,6 +78,6 @@ if __name__ == "__main__":
     else:
         raise NotImplementedError("Only Canny edge detection supported ATM")
 
-    display = Display(resolution, character, preprocess_func=preprocess)
+    display = Display(resolution, character, preprocess_func=preprocess, fit_to_terminal=args.fit_to_terminal)
 
-    display.show_media(media)
+    display.show_media(media, fps=args.fps, loop=args.loop)
