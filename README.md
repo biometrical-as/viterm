@@ -53,16 +53,16 @@ To make an alias, append the following line to your .bashrc (linux) or .zshrc (m
 
 ### Linux
 ```bash 
-alias viterm="python <path-to-repo/scripts/run.py"
+alias viterm="python <path-to-repo>/scripts/run.py"
 ```
 
 ### MAC
 ```bash
-viterm() { python <path-to-repo/scripts/run.py> "$@" ;}
+viterm() { python <path-to-repo>/scripts/run.py "$@" ;}
 ```
 If you want it to run in a specific conda environment, add the following instead:
 ```bash
-viterm() { conda run -n <your environment name> python <path-to-repo/scripts/run.py> "$@" ;}
+viterm() { conda run -n <your environment name> python <path-to-repo>/scripts/run.py "$@" ;}
 ```
 
 Run ```source ~/.bashrc``` (linux) or ```source ~/.zshrc``` (mac). You can now call viterm in your terminal with ```viterm```
