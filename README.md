@@ -32,11 +32,6 @@ display.show_media(<file_path or cam index>)
 When displaying video, viterm will do its best to keep 30fps. 
 
 ## CLI
-Without alias:
-```bash
-python scripts/run.py <media> -r <Height Width> -c <display character> 
-```
-With alias:
 ```bash
 viterm <media> -r <Height Width> -c <display character> 
 ```
@@ -47,22 +42,3 @@ viterm <media> -r <Height Width> -c <display character>
 * --fit_to_terminal: Resize image/video to fit terminal size
 * --loop: loops media
 * --preprocess: Runs a aditional preprocessor on media. Only Canny edge detections is supported ATM
-
-## Optional
-To make an alias, append the following line to your .bashrc (linux) or .zshrc (mac):
-
-### Linux
-```bash 
-alias viterm="python <path-to-repo>/scripts/run.py"
-```
-
-### MAC
-```bash
-viterm() { python <path-to-repo>/scripts/run.py "$@" ;}
-```
-If you want it to run in a specific conda environment, add the following instead:
-```bash
-viterm() { conda run -n <your environment name> python <path-to-repo>/scripts/run.py "$@" ;}
-```
-
-Run ```source ~/.bashrc``` (linux) or ```source ~/.zshrc``` (mac). You can now call viterm in your terminal with ```viterm```

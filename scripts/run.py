@@ -1,82 +1,76 @@
-from argparse import ArgumentParser
+from typing import Tuple, List
 
-import cv2
-import numpy as np
+import typer
+from typer import Argument, Option
 
-from viterm import Display
+from viterm import Display, Preprocessor, canny, gray
 
 
-def parse_args():
-    parser = ArgumentParser(
-        "ViTerm: displays low-color-representation of image or video in terminal"
-    )
-    parser.add_argument(
-        "media",
-        type=str,
-        help="Media file to display. Image or video. Index for usb camera",
-    )
-    parser.add_argument(
-        "--character",
-        "-c",
-        default=Display.STORED_CELL_CHAR,
-        help="Ascii character used",
-    )
-    parser.add_argument(
-        "--fit_to_terminal",
-        "-f",
-        action="store_true",
-        help="Fit image to terminal size, keeping aspect ratio",
-    )
-    parser.add_argument(
+def get_preprocessor_function(preprocessors: List[Preprocessor]):
+    preprocessors = [] if preprocessors is None else preprocessors
+
+    def _func(image):
+        for prep in preprocessors:
+            if prep == Preprocessor.CANNY:
+                image = canny(image)
+            if prep == Preprocessor.GRAY:
+                image = gray(image)
+        return image
+
+    return _func
+
+
+app = typer.Typer()
+
+
+@app.command()
+def main(
+    source: str = Argument(
+        ..., show_default=False, help="Media source. [path | rtsp | camera index]"
+    ),
+    character: str = Option(
+        Display.STORED_CELL_CHAR, "--character", "-c", help="Ascii character used"
+    ),
+    fit: bool = Option(
+        True, "--fit_to_terminal", "-f", help="Fit image to terminal size."
+    ),
+    resolution: Tuple[int, int] = Option(
+        (None, None),
         "--resolution",
         "-r",
-        nargs=2,
-        default=None,
+        show_default=False,
+        min=0,
         help="Output resolution",
-    )
-    parser.add_argument(
-        "--loop",
-        "-l",
-        action="store_true",
-        help="Loop media",
-    )
-    parser.add_argument("--fps", default=30, type=int, help="Set FPS of video")
-    parser.add_argument(
+    ),
+    loop: bool = Option(False, "--loop", "-l", help="Loops media if video"),
+    fps: int = Option(30, "--fps", "-f", min=0, help="Set FPS of video"),
+    preprocessors: List[Preprocessor] = Option(
+        None,
         "--preprocess",
         "-p",
-        type=str,
-        help="Preprocess function. Only canny edgedetection supported atm",
-    )
-    return parser.parse_args()
-
-
-def canny(image: np.ndarray):
-    image = cv2.Canny(image, 100, 200)
-    image = cv2.cvtColor(image, cv2.COLOR_GRAY2RGB)
-    return image
-
-
-if __name__ == "__main__":
-    args = parse_args()
-    resolution = args.resolution
-    character = args.character
-    media = args.media
+        show_default=False,
+        case_sensitive=False,
+        help="Preprocessing function applied to media",
+    ),
+):
+    """
+    Displays low-color-representation of media in terminal as colored ascii characters.
+    Media source might be image or video path, rtsp stream or usb camera index,
+    or anything else opencv`s VideoCapture might accept.
+    """
     try:
-        media = int(media)
+        source = int(source)
     except Exception:
         pass
-
-    if args.preprocess == "canny":
-        preprocess = canny
-    elif args.preprocess is None:
-        preprocess = None
-    else:
-        raise NotImplementedError("Only Canny edge detection supported ATM")
 
     display = Display(
         resolution,
         character,
-        preprocess_func=preprocess,
-        fit_to_terminal=args.fit_to_terminal,
+        preprocess_func=get_preprocessor_function(preprocessors),
+        fit_to_terminal=fit,
     )
-    display.show_media(media, fps=args.fps, loop=args.loop)
+    display.show_media(source, fps=fps, loop=loop)
+
+
+if __name__ == "__main__":
+    app()
