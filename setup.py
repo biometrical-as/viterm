@@ -14,6 +14,6 @@ setup(
     license="MIT",
     packages=["viterm"],
     install_requires=requirements,
-    # scripts=["bin/viterm"],
-    entry_points={"console_scripts": ["viterm = scripts.run:app"]},
+    scripts=["bin/viterm"],
+    entry_points={"console_scripts": ["viterm = viterm.run:app"]},
 )
