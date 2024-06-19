@@ -23,7 +23,6 @@ def get_preprocessor_function(preprocessors: List[Preprocessor]):
 app = typer.Typer()
 
 
-
 @app.command()
 def main(
     source: str = Argument(
