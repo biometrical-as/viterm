@@ -6,7 +6,6 @@ from typer import Argument, Option
 from viterm import Display, Preprocessor, canny, gray
 
 
-
 def get_preprocessor_function(preprocessors: List[Preprocessor]):
     preprocessors = [] if preprocessors is None else preprocessors
 
